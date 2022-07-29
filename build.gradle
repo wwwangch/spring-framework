@@ -252,6 +252,9 @@ configure(allprojects) { project ->
 			cacheChangingModulesFor 0, "seconds"
 		}
 		repositories {
+			//新增以下2个阿里云镜像
+			maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+			maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
 			mavenCentral()
 			maven { url "https://repo.spring.io/libs-spring-framework-build" }
 			maven { url "https://repo.spring.io/milestone" } // temporarily for context-propagation via Reactor Netty
