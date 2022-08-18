@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package com.wch.study.spring.service;
+package com.wch.study.spring.server;
 
-import org.springframework.stereotype.Component;
+import com.wch.study.spring.service.AService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * qqq.
  *
  * @author ch w
- * @since 2022/8/18 9:55
  * @version 1.0
+ * @since 2022/8/18 9:55
  */
-@Component
-public class AService {
+public class AServiceTests {
+
+	@Test
+	public void testGetBean() {
+		ConfigurableApplicationContext applicationContext = new ClassPathXmlApplicationContext("application-context.xml");
+		System.out.println(applicationContext.getBean(AService.class));
+	}
 }
