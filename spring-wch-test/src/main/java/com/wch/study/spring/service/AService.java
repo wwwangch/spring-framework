@@ -16,6 +16,7 @@
 
 package com.wch.study.spring.service;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 /**

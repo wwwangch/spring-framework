@@ -46,6 +46,7 @@ import org.springframework.util.ObjectUtils;
 @SuppressWarnings("serial")
 public class ChildBeanDefinition extends AbstractBeanDefinition {
 
+	// 父bean的名称
 	@Nullable
 	private String parentName;
 

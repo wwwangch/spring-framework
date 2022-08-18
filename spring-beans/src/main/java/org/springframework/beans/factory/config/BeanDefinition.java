@@ -23,26 +23,12 @@ import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 
 /**
- * A BeanDefinition describes a bean instance, which has property values,
- * constructor argument values, and further information supplied by
- * concrete implementations.
- *
- * <p>This is just a minimal interface: The main intention is to allow a
- * {@link BeanFactoryPostProcessor} to introspect and modify property values
- * and other bean metadata.
- *
- * @author Juergen Hoeller
- * @author Rob Harrop
- * @since 19.03.2004
- * @see ConfigurableListableBeanFactory#getBeanDefinition
- * @see org.springframework.beans.factory.support.RootBeanDefinition
- * @see org.springframework.beans.factory.support.ChildBeanDefinition
+ * BeanDefinition 描述了一个 bean 实例，它具有属性值、构造函数参数值以及具体实现提供的更多信息
  */
 public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 	/**
-	 * Scope identifier for the standard singleton scope: {@value}.
-	 * <p>Note that extended bean factories might support further scopes.
+	 * 代表是单例Bean
 	 * @see #setScope
 	 * @see ConfigurableBeanFactory#SCOPE_SINGLETON
 	 */
@@ -51,47 +37,31 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	/**
 	 * Scope identifier for the standard prototype scope: {@value}.
 	 * <p>Note that extended bean factories might support further scopes.
+	 * 代表是原型Bean
 	 * @see #setScope
 	 * @see ConfigurableBeanFactory#SCOPE_PROTOTYPE
 	 */
 	String SCOPE_PROTOTYPE = ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 
-	/**
-	 * Role hint indicating that a {@code BeanDefinition} is a major part
-	 * of the application. Typically corresponds to a user-defined bean.
-	 */
-	int ROLE_APPLICATION = 0;
 
-	/**
-	 * Role hint indicating that a {@code BeanDefinition} is a supporting
-	 * part of some larger configuration, typically an outer
-	 * {@link org.springframework.beans.factory.parsing.ComponentDefinition}.
-	 * {@code SUPPORT} beans are considered important enough to be aware
-	 * of when looking more closely at a particular
-	 * {@link org.springframework.beans.factory.parsing.ComponentDefinition},
-	 * but not when looking at the overall configuration of an application.
-	 */
-	int ROLE_SUPPORT = 1;
+	//Bean角色
+	int ROLE_APPLICATION = 0;  //用户自定义的Bean
 
-	/**
-	 * Role hint indicating that a {@code BeanDefinition} is providing an
-	 * entirely background role and has no relevance to the end-user. This hint is
-	 * used when registering beans that are completely part of the internal workings
-	 * of a {@link org.springframework.beans.factory.parsing.ComponentDefinition}.
-	 */
-	int ROLE_INFRASTRUCTURE = 2;
+	int ROLE_SUPPORT = 1;      //来源于配置文件的Bean
+
+	int ROLE_INFRASTRUCTURE = 2; //Spring内部的Bean
 
 
 	// Modifiable attributes
 
 	/**
-	 * Set the name of the parent definition of this bean definition, if any.
+	 * 配置 /设置父BeanDefinition的名称   XML中的 <bean parent="">
 	 */
 	void setParentName(@Nullable String parentName);
 
 	/**
-	 * Return the name of the parent definition of this bean definition, if any.
+	 * 配置/获取父BeanDefinition的名称   XML中的 <bean parent="">
 	 */
 	@Nullable
 	String getParentName();
@@ -175,9 +145,8 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	boolean isAutowireCandidate();
 
 	/**
-	 * Set whether this bean is a primary autowire candidate.
-	 * <p>If this value is {@code true} for exactly one bean among multiple
-	 * matching candidates, it will serve as a tie-breaker.
+	 * 如果找到了多个可注入bean，那么则选择被Primary标记的bean/获取当
+	 * //前 Bean 是否为首选的 Bean  XML中的 <bean primary="">
 	 */
 	void setPrimary(boolean primary);
 
@@ -187,43 +156,29 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	boolean isPrimary();
 
 	/**
-	 * Specify the factory bean to use, if any.
-	 * This the name of the bean to call the specified factory method on.
-	 * @see #setFactoryMethodName
+	 * 配置/获取 FactoryBean 的名字  XML中的<bean factory-bean="">
 	 */
 	void setFactoryBeanName(@Nullable String factoryBeanName);
 
-	/**
-	 * Return the factory bean name, if any.
-	 */
 	@Nullable
 	String getFactoryBeanName();
 
 	/**
-	 * Specify a factory method, if any. This method will be invoked with
-	 * constructor arguments, or with no arguments if none are specified.
-	 * The method will be invoked on the specified factory bean, if any,
-	 * or otherwise as a static method on the local bean class.
-	 * @see #setFactoryBeanName
-	 * @see #setBeanClassName
+	 * 配置/获取 FactoryMethod 的名字，可以是某个实例的方法（和factoryBean配合使用）
+	 * 也可以是静态方法。 XML 中的<bean factory-method="">
 	 */
 	void setFactoryMethodName(@Nullable String factoryMethodName);
 
-	/**
-	 * Return a factory method, if any.
-	 */
 	@Nullable
 	String getFactoryMethodName();
 
 	/**
-	 * Return the constructor argument values for this bean.
-	 * <p>The returned instance can be modified during bean factory post-processing.
-	 * @return the ConstructorArgumentValues object (never {@code null})
+	 * 返回该 Bean 构造方法的参数值
 	 */
 	ConstructorArgumentValues getConstructorArgumentValues();
 
 	/**
-	 * Return if there are constructor argument values defined for this bean.
+	 * 判断 getConstructorArgumentValues 是否是空对象。
 	 * @since 5.0.2
 	 */
 	default boolean hasConstructorArgumentValues() {
@@ -231,14 +186,12 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	}
 
 	/**
-	 * Return the property values to be applied to a new instance of the bean.
-	 * <p>The returned instance can be modified during bean factory post-processing.
-	 * @return the MutablePropertyValues object (never {@code null})
+	 * 获取普通属性的集合
 	 */
 	MutablePropertyValues getPropertyValues();
 
 	/**
-	 * Return if there are property values defined for this bean.
+	 * 判断 getPropertyValues 是否为空对象
 	 * @since 5.0.2
 	 */
 	default boolean hasPropertyValues() {
@@ -246,61 +199,35 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	}
 
 	/**
-	 * Set the name of the initializer method.
+	 * 配置/获取 Bean 的初始化方法 XML中的<bean init-method="">
 	 * @since 5.1
 	 */
 	void setInitMethodName(@Nullable String initMethodName);
 
-	/**
-	 * Return the name of the initializer method.
-	 * @since 5.1
-	 */
 	@Nullable
 	String getInitMethodName();
 
 	/**
-	 * Set the name of the destroy method.
+	 * 配置/获取 Bean 的销毁方法  XML中的<bean destroy-method="">
 	 * @since 5.1
 	 */
 	void setDestroyMethodName(@Nullable String destroyMethodName);
 
-	/**
-	 * Return the name of the destroy method.
-	 * @since 5.1
-	 */
 	@Nullable
 	String getDestroyMethodName();
 
 	/**
-	 * Set the role hint for this {@code BeanDefinition}. The role hint
-	 * provides the frameworks as well as tools an indication of
-	 * the role and importance of a particular {@code BeanDefinition}.
-	 * @since 5.1
-	 * @see #ROLE_APPLICATION
-	 * @see #ROLE_SUPPORT
-	 * @see #ROLE_INFRASTRUCTURE
+	 * 配置/获取 Bean的角色
 	 */
 	void setRole(int role);
 
-	/**
-	 * Get the role hint for this {@code BeanDefinition}. The role hint
-	 * provides the frameworks as well as tools an indication of
-	 * the role and importance of a particular {@code BeanDefinition}.
-	 * @see #ROLE_APPLICATION
-	 * @see #ROLE_SUPPORT
-	 * @see #ROLE_INFRASTRUCTURE
-	 */
 	int getRole();
 
 	/**
-	 * Set a human-readable description of this bean definition.
-	 * @since 5.1
+	 * 配置/获取 Bean 的描述
 	 */
 	void setDescription(@Nullable String description);
 
-	/**
-	 * Return a human-readable description of this bean definition.
-	 */
 	@Nullable
 	String getDescription();
 
@@ -308,48 +235,33 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	// Read-only attributes
 
 	/**
-	 * Return a resolvable type for this bean definition,
-	 * based on the bean class or other specific metadata.
-	 * <p>This is typically fully resolved on a runtime-merged bean definition
-	 * but not necessarily on a configuration-time definition instance.
-	 * @return the resolvable type (potentially {@link ResolvableType#NONE})
-	 * @since 5.2
-	 * @see ConfigurableBeanFactory#getMergedBeanDefinition
+	 * 用来解析一个Bean对应的类型上的各种信息，比如泛型
 	 */
 	ResolvableType getResolvableType();
 
 	/**
-	 * Return whether this a <b>Singleton</b>, with a single, shared instance
-	 * returned on all calls.
-	 * @see #SCOPE_SINGLETON
+	 * 是否为单例
 	 */
 	boolean isSingleton();
 
 	/**
-	 * Return whether this a <b>Prototype</b>, with an independent instance
-	 * returned for each call.
-	 * @since 3.0
-	 * @see #SCOPE_PROTOTYPE
+	 * 是否为原型
 	 */
 	boolean isPrototype();
 
 	/**
-	 * Return whether this bean is "abstract", that is, not meant to be instantiated.
+	 * 是否抽象  XML 中的<bean abstract="true">
 	 */
 	boolean isAbstract();
 
 	/**
-	 * Return a description of the resource that this bean definition
-	 * came from (for the purpose of showing context in case of errors).
+	 * 返回定义 Bean 的资源描述(便于出错时找到上下文)
 	 */
 	@Nullable
 	String getResourceDescription();
 
 	/**
-	 * Return the originating BeanDefinition, or {@code null} if none.
-	 * <p>Allows for retrieving the decorated bean definition, if any.
-	 * <p>Note that this method returns the immediate originator. Iterate through the
-	 * originator chain to find the original BeanDefinition as defined by the user.
+	 *  如果当前 BeanDefinition 是一个代理对象，那么该方法可以用来返回原始的 BeanDefinition
 	 */
 	@Nullable
 	BeanDefinition getOriginatingBeanDefinition();

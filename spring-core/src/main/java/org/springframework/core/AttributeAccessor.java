@@ -25,6 +25,8 @@ import org.springframework.util.Assert;
  * Interface defining a generic contract for attaching and accessing metadata
  * to/from arbitrary objects.
  *
+ * 定义用于附加和访问元数据的通用协定的接口，可以是任意对象。
+ * 具体的实现则是 AttributeAccessorSupport，采用 LinkedHashMap 进行存储。
  * @author Rob Harrop
  * @author Sam Brannen
  * @since 2.0
@@ -37,6 +39,7 @@ public interface AttributeAccessor {
 	 * <p>In general, users should take care to prevent overlaps with other
 	 * metadata attributes by using fully-qualified names, perhaps using
 	 * class or package names as prefix.
+	 * 设置属性的值(名称唯一)
 	 * @param name the unique attribute key
 	 * @param value the attribute value to be attached
 	 */
@@ -45,6 +48,7 @@ public interface AttributeAccessor {
 	/**
 	 * Get the value of the attribute identified by {@code name}.
 	 * <p>Return {@code null} if the attribute doesn't exist.
+	 * 获得指定属性名称的值,如果不存在返回null
 	 * @param name the unique attribute key
 	 * @return the current value of the attribute, if any
 	 */
@@ -60,6 +64,7 @@ public interface AttributeAccessor {
 	 * without applying the supplied compute function.
 	 * <p>The default implementation of this method is not thread safe but can
 	 * be overridden by concrete implementations of this interface.
+	 * 如果属性值为null，重新计算，返回新值,否则不应用重新计算函数，并返回已存在值
 	 * @param <T> the type of the attribute value
 	 * @param name the unique attribute key
 	 * @param computeFunction a function that computes a new value for the attribute
@@ -86,6 +91,7 @@ public interface AttributeAccessor {
 	/**
 	 * Remove the attribute identified by {@code name} and return its value.
 	 * <p>Return {@code null} if no attribute under {@code name} is found.
+	 * 删除指定的name的属性,如果不存在则返回null
 	 * @param name the unique attribute key
 	 * @return the last value of the attribute, if any
 	 */
@@ -94,6 +100,7 @@ public interface AttributeAccessor {
 
 	/**
 	 * Return {@code true} if the attribute identified by {@code name} exists.
+	 * 判断指定的属性名称是否存在
 	 * <p>Otherwise return {@code false}.
 	 * @param name the unique attribute key
 	 */
@@ -101,6 +108,7 @@ public interface AttributeAccessor {
 
 	/**
 	 * Return the names of all attributes.
+	 * 返回所有属性的名称
 	 */
 	String[] attributeNames();
 

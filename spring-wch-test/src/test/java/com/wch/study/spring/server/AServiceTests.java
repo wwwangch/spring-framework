@@ -20,6 +20,8 @@ import com.wch.study.spring.service.AService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -35,6 +37,7 @@ public class AServiceTests {
 	@Test
 	public void testGetBean() {
 		ConfigurableApplicationContext applicationContext = new ClassPathXmlApplicationContext("application-context.xml");
+
 		System.out.println(applicationContext.getBean(AService.class));
 	}
 }

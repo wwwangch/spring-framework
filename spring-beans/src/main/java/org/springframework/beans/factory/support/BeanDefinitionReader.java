@@ -33,6 +33,8 @@ import org.springframework.lang.Nullable;
  * this interface. It only serves as a suggestion for bean definition
  * readers that want to follow standard naming conventions.
  *
+ * BeanDefinitionReader 的作用是读取 Spring配置文件中的内容，
+ * 将之解析为BeanDefinition并注册到 BeanDefinitionRegistry 工厂中。
  * @author Juergen Hoeller
  * @since 1.1
  * @see org.springframework.core.io.Resource
@@ -40,13 +42,12 @@ import org.springframework.lang.Nullable;
 public interface BeanDefinitionReader {
 
 	/**
-	 * Return the bean factory to register the bean definitions with.
-	 * <p>The factory is exposed through the {@link BeanDefinitionRegistry} interface,
-	 * encapsulating the methods that are relevant for bean definition handling.
+	 * 返回用于注册bean定义的bean工厂,工厂通过BeanDefinitionRegistry暴露出来
 	 */
 	BeanDefinitionRegistry getRegistry();
 
 	/**
+	 * 资源加载器，主要应用于根据给定的资源文件地址返回对应的Resource
 	 * Return the {@link ResourceLoader} to use for resource locations.
 	 * <p>Can be checked for the {@code ResourcePatternResolver} interface and cast
 	 * accordingly, for loading multiple resources for a given resource pattern.
@@ -67,6 +68,7 @@ public interface BeanDefinitionReader {
 	ResourceLoader getResourceLoader();
 
 	/**
+	 * 返回类加载器
 	 * Return the class loader to use for bean classes.
 	 * <p>{@code null} suggests to not load bean classes eagerly
 	 * but rather to just register bean definitions with class names,
@@ -76,29 +78,25 @@ public interface BeanDefinitionReader {
 	ClassLoader getBeanClassLoader();
 
 	/**
-	 * Return the {@link BeanNameGenerator} to use for anonymous beans
-	 * (without explicit bean name specified).
+	 * BeanName生成器
+	 * 为没有明确指定bean名称的Bean生成一个名称
 	 */
 	BeanNameGenerator getBeanNameGenerator();
 
 
 	/**
-	 * Load bean definitions from the specified resource.
-	 * @param resource the resource descriptor
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
+	 * 从指定的资源加载bean定义,返回找到的bean定义的数量
 	 */
 	int loadBeanDefinitions(Resource resource) throws BeanDefinitionStoreException;
 
 	/**
-	 * Load bean definitions from the specified resources.
-	 * @param resources the resource descriptors
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
+	 * 指定多个资源加载bean定义,返回找到的bean定义的数量
 	 */
 	int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException;
 
 	/**
+	 * 从指定的资源位置加载bean定义
+	 * 该位置也可以是位置模式，前提是此bean定义读取器的ResourceLoader是ResourcePatternResolver。
 	 * Load bean definitions from the specified resource location.
 	 * <p>The location can also be a location pattern, provided that the
 	 * {@link ResourceLoader} of this bean definition reader is a
@@ -114,6 +112,7 @@ public interface BeanDefinitionReader {
 	int loadBeanDefinitions(String location) throws BeanDefinitionStoreException;
 
 	/**
+	 * 加载多个配置文件路径
 	 * Load bean definitions from the specified resource locations.
 	 * @param locations the resource locations, to be loaded with the {@code ResourceLoader}
 	 * (or {@code ResourcePatternResolver}) of this bean definition reader

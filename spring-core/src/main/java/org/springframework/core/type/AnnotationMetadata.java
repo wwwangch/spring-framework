@@ -26,13 +26,7 @@ import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
 
 /**
- * Interface that defines abstract access to the annotations of a specific
- * class, in a form that does not require that class to be loaded yet.
- *
- * @author Juergen Hoeller
- * @author Mark Fisher
- * @author Phillip Webb
- * @author Sam Brannen
+ * 主要对 Bean 的注解信息进行操作，如：获取当前 Bean 标注的所有注解、判断是否包含指定注解。
  * @since 2.5
  * @see StandardAnnotationMetadata
  * @see org.springframework.core.type.classreading.MetadataReader#getAnnotationMetadata()
@@ -41,8 +35,7 @@ import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
 public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata {
 
 	/**
-	 * Get the fully qualified class names of all annotation types that
-	 * are <em>present</em> on the underlying class.
+	 * 获取所有注解完全限定类名
 	 * @return the annotation type names
 	 */
 	default Set<String> getAnnotationTypes() {
@@ -53,10 +46,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	}
 
 	/**
-	 * Get the fully qualified class names of all meta-annotation types that
-	 * are <em>present</em> on the given annotation type on the underlying class.
-	 * @param annotationName the fully qualified class name of the meta-annotation
-	 * type to look for
+	 * 获得annottationName对应的元注解的类全限定名
 	 * @return the meta-annotation type names, or an empty set if none found
 	 */
 	default Set<String> getMetaAnnotationTypes(String annotationName) {
@@ -70,10 +60,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	}
 
 	/**
-	 * Determine whether an annotation of the given type is <em>present</em> on
-	 * the underlying class.
-	 * @param annotationName the fully qualified class name of the annotation
-	 * type to look for
+	 * 是否包含指定注解
 	 * @return {@code true} if a matching annotation is present
 	 */
 	default boolean hasAnnotation(String annotationName) {
@@ -81,10 +68,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	}
 
 	/**
-	 * Determine whether the underlying class has an annotation that is itself
-	 * annotated with the meta-annotation of the given type.
-	 * @param metaAnnotationName the fully qualified class name of the
-	 * meta-annotation type to look for
+	 * 确定是否含有某个元注解
 	 * @return {@code true} if a matching meta-annotation is present
 	 */
 	default boolean hasMetaAnnotation(String metaAnnotationName) {
@@ -93,35 +77,20 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	}
 
 	/**
-	 * Determine whether the underlying class has any methods that are
-	 * annotated (or meta-annotated) with the given annotation type.
-	 * @param annotationName the fully qualified class name of the annotation
-	 * type to look for
+	 * 类里面只要有一个方法标注有指定注解，就返回true
 	 */
 	default boolean hasAnnotatedMethods(String annotationName) {
 		return !getAnnotatedMethods(annotationName).isEmpty();
 	}
 
 	/**
-	 * Retrieve the method metadata for all methods that are annotated
-	 * (or meta-annotated) with the given annotation type.
-	 * <p>For any returned method, {@link MethodMetadata#isAnnotated} will
-	 * return {@code true} for the given annotation type.
-	 * @param annotationName the fully qualified class name of the annotation
-	 * type to look for
-	 * @return a set of {@link MethodMetadata} for methods that have a matching
-	 * annotation. The return value will be an empty set if no methods match
-	 * the annotation type.
+	 * 返回所有的标注有指定注解的方法元信息
 	 */
 	Set<MethodMetadata> getAnnotatedMethods(String annotationName);
 
 
 	/**
-	 * Factory method to create a new {@link AnnotationMetadata} instance
-	 * for the given class using standard reflection.
-	 * @param type the class to introspect
-	 * @return a new {@link AnnotationMetadata} instance
-	 * @since 5.2
+	 * 工厂方法来使用标准反射为给定的类创建一个新的AnnotationMetadata实例
 	 */
 	static AnnotationMetadata introspect(Class<?> type) {
 		return StandardAnnotationMetadata.from(type);
