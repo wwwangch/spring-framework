@@ -1,36 +1,28 @@
 package com.wch.study.spring.entity;
 
+import java.util.Objects;
+
 /**
  * @author ch w
  * @version 1.0
  * @since 2022/8/18 15:26
  */
 public class User {
-	public User() {
-	}
-
-	public User(String name, String address) {
-		this.name = name;
-		this.address = address;
-	}
-
-	@Override
-	public String toString() {
-		return "User{" +
-				"name='" + name + '\'' +
-				", address='" + address + '\'' +
-				'}';
-	}
-
-	private String name;
+	private Integer id;
 	private String address;
 
-	public String getName() {
-		return name;
+	private String name;
+
+	public void init() {
+		System.out.println("init方法");
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public String getAddress() {
@@ -41,4 +33,20 @@ public class User {
 		this.address = address;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return "User{" +
+				"id=" + id +
+				", address='" + address + '\'' +
+				", name='" + name + '\'' +
+				'}';
+	}
 }

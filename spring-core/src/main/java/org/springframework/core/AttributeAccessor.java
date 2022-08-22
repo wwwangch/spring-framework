@@ -22,57 +22,24 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Interface defining a generic contract for attaching and accessing metadata
- * to/from arbitrary objects.
- *
  * 定义用于附加和访问元数据的通用协定的接口，可以是任意对象。
  * 具体的实现则是 AttributeAccessorSupport，采用 LinkedHashMap 进行存储。
- * @author Rob Harrop
- * @author Sam Brannen
- * @since 2.0
  */
 public interface AttributeAccessor {
 
 	/**
-	 * Set the attribute defined by {@code name} to the supplied {@code value}.
-	 * <p>If {@code value} is {@code null}, the attribute is {@link #removeAttribute removed}.
-	 * <p>In general, users should take care to prevent overlaps with other
-	 * metadata attributes by using fully-qualified names, perhaps using
-	 * class or package names as prefix.
 	 * 设置属性的值(名称唯一)
-	 * @param name the unique attribute key
-	 * @param value the attribute value to be attached
 	 */
 	void setAttribute(String name, @Nullable Object value);
 
 	/**
-	 * Get the value of the attribute identified by {@code name}.
-	 * <p>Return {@code null} if the attribute doesn't exist.
 	 * 获得指定属性名称的值,如果不存在返回null
-	 * @param name the unique attribute key
-	 * @return the current value of the attribute, if any
 	 */
 	@Nullable
 	Object getAttribute(String name);
 
 	/**
-	 * Compute a new value for the attribute identified by {@code name} if
-	 * necessary and {@linkplain #setAttribute set} the new value in this
-	 * {@code AttributeAccessor}.
-	 * <p>If a value for the attribute identified by {@code name} already exists
-	 * in this {@code AttributeAccessor}, the existing value will be returned
-	 * without applying the supplied compute function.
-	 * <p>The default implementation of this method is not thread safe but can
-	 * be overridden by concrete implementations of this interface.
 	 * 如果属性值为null，重新计算，返回新值,否则不应用重新计算函数，并返回已存在值
-	 * @param <T> the type of the attribute value
-	 * @param name the unique attribute key
-	 * @param computeFunction a function that computes a new value for the attribute
-	 * name; the function must not return a {@code null} value
-	 * @return the existing value or newly computed value for the named attribute
-	 * @since 5.3.3
-	 * @see #getAttribute(String)
-	 * @see #setAttribute(String, Object)
 	 */
 	@SuppressWarnings("unchecked")
 	default <T> T computeAttribute(String name, Function<String, T> computeFunction) {
@@ -89,25 +56,17 @@ public interface AttributeAccessor {
 	}
 
 	/**
-	 * Remove the attribute identified by {@code name} and return its value.
-	 * <p>Return {@code null} if no attribute under {@code name} is found.
 	 * 删除指定的name的属性,如果不存在则返回null
-	 * @param name the unique attribute key
-	 * @return the last value of the attribute, if any
 	 */
 	@Nullable
 	Object removeAttribute(String name);
 
 	/**
-	 * Return {@code true} if the attribute identified by {@code name} exists.
 	 * 判断指定的属性名称是否存在
-	 * <p>Otherwise return {@code false}.
-	 * @param name the unique attribute key
 	 */
 	boolean hasAttribute(String name);
 
 	/**
-	 * Return the names of all attributes.
 	 * 返回所有属性的名称
 	 */
 	String[] attributeNames();

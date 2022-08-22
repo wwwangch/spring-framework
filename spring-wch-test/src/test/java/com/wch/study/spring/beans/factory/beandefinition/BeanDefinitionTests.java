@@ -117,6 +117,5 @@ public class BeanDefinitionTests {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MyConfig.class);
 		BeanDefinition qq = context.getBeanFactory().getBeanDefinition("qq");
 		System.out.println(qq.getClass());
-
 	}
 }
