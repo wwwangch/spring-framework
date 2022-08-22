@@ -35,15 +35,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Abstract base class for bean definition readers which implement
- * the {@link BeanDefinitionReader} interface.
- *
- * <p>Provides common properties like the bean factory to work on
- * and the class loader to use for loading bean classes.
- *
- * @author Juergen Hoeller
- * @author Chris Beams
- * @since 11.12.2003
+ * 实现BeanDefinitionReader接口的 bean 定义读取器的抽象基类。
+ * 提供通用属性，例如要处理的 bean 工厂和用于加载 bean 类的类加载器。
  * @see BeanDefinitionReaderUtils
  */
 public abstract class AbstractBeanDefinitionReader implements BeanDefinitionReader, EnvironmentCapable {
@@ -51,33 +44,31 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	//注册bean定义的bean工厂
 	private final BeanDefinitionRegistry registry;
 
+	//资源加载起
 	@Nullable
 	private ResourceLoader resourceLoader;
 
+	//类加载器
 	@Nullable
 	private ClassLoader beanClassLoader;
 
+	//环境
 	private Environment environment;
 
+	//beanName生成器
 	private BeanNameGenerator beanNameGenerator = DefaultBeanNameGenerator.INSTANCE;
 
 
 	/**
-	 * Create a new AbstractBeanDefinitionReader for the given bean factory.
-	 * <p>If the passed-in bean factory does not only implement the BeanDefinitionRegistry
-	 * interface but also the ResourceLoader interface, it will be used as default
-	 * ResourceLoader as well. This will usually be the case for
-	 * {@link org.springframework.context.ApplicationContext} implementations.
-	 * <p>If given a plain BeanDefinitionRegistry, the default ResourceLoader will be a
-	 * {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver}.
-	 * <p>If the passed-in bean factory also implements {@link EnvironmentCapable} its
-	 * environment will be used by this reader.  Otherwise, the reader will initialize and
-	 * use a {@link StandardEnvironment}. All ApplicationContext implementations are
-	 * EnvironmentCapable, while normal BeanFactory implementations are not.
-	 * @param registry the BeanFactory to load bean definitions into,
-	 * in the form of a BeanDefinitionRegistry
+	 * 为给定的 bean 工厂创建一个新的 AbstractBeanDefinitionReader。
+	 * 如果传入的 bean factory 不仅实现了 BeanDefinitionRegistry 接口，还实现了 ResourceLoader 接口，那么它也会被用作默认的 ResourceLoader。
+	 * 这通常是org.springframework.context.ApplicationContext实现的情况。
+	 * 如果给定一个普通的 BeanDefinitionRegistry，默认的 ResourceLoader 将是一个PathMatchingResourcePatternResolver 。
+	 * 如果传入的 bean 工厂也实现了EnvironmentCapable它的环境将被这个读者使用。否则，阅读器将初始化并使用StandardEnvironment 。
+	 * 所有的 ApplicationContext 实现都是 EnvironmentCapable，而普通的 BeanFactory 实现不是
 	 * @see #setResourceLoader
 	 * @see #setEnvironment
 	 */
@@ -85,7 +76,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		this.registry = registry;
 
-		// Determine ResourceLoader to use.
+		// 如果传入的registry实现了ResourceLoader采用传入的，否则采用PathMatchingResourcePatternResolver
 		if (this.registry instanceof ResourceLoader) {
 			this.resourceLoader = (ResourceLoader) this.registry;
 		}
@@ -93,7 +84,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 			this.resourceLoader = new PathMatchingResourcePatternResolver();
 		}
 
-		// Inherit Environment if possible
+		// 查看继承的环境是否可用，不可用则新建StandardEnvironment
 		if (this.registry instanceof EnvironmentCapable) {
 			this.environment = ((EnvironmentCapable) this.registry).getEnvironment();
 		}
@@ -104,11 +95,9 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 
 
 	/**
-	 * Return the bean factory to register the bean definitions with.
-	 * <p>The factory is exposed through the BeanDefinitionRegistry interface,
-	 * encapsulating the methods that are relevant for bean definition handling.
-	 * @deprecated as of Spring Framework 5.3.15 in favor of {@link #getRegistry()},
-	 * to be removed in Spring Framework 6.0
+	 * 返回 bean 工厂以注册 bean 定义。
+	 * 工厂通过 BeanDefinitionRegistry 接口公开，封装了与 bean 定义处理相关的方法。
+	 * 5.3.15弃用 6.0将移除
 	 */
 	@Deprecated
 	public final BeanDefinitionRegistry getBeanFactory() {
@@ -200,6 +189,8 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 
 	@Override
 	public int loadBeanDefinitions(String location) throws BeanDefinitionStoreException {
+
+		//通过调用本类中的loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources)方法
 		return loadBeanDefinitions(location, null);
 	}
 
@@ -219,7 +210,9 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
 	public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {
+		//获取资源加载器
 		ResourceLoader resourceLoader = getResourceLoader();
+		//对资源加载器判空
 		if (resourceLoader == null) {
 			throw new BeanDefinitionStoreException(
 					"Cannot load bean definitions from location [" + location + "]: no ResourceLoader available");
@@ -228,7 +221,9 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			// Resource pattern matching available.
 			try {
+				//根据资源路径调用ResourcePatternResolver的getResources方法，此方法可以加载多个资源
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
+				//根据资源来加载bean定义，调用本类loadBeanDefinitions(Resource... resources)方法
 				int count = loadBeanDefinitions(resources);
 				if (actualResources != null) {
 					Collections.addAll(actualResources, resources);
@@ -244,8 +239,9 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 			}
 		}
 		else {
-			// Can only load single resources by absolute URL.
+			//此方法只能加载一个资源  (绝对路径)
 			Resource resource = resourceLoader.getResource(location);
+			//调用父类的loadBeanDefinitions(resources)方法，然后走不同的子类实现
 			int count = loadBeanDefinitions(resource);
 			if (actualResources != null) {
 				actualResources.add(resource);
@@ -262,6 +258,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		Assert.notNull(locations, "Location array must not be null");
 		int count = 0;
 		for (String location : locations) {
+			//通过调用loadBeanDefinitions(String locations)
 			count += loadBeanDefinitions(location);
 		}
 		return count;

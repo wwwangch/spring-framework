@@ -9,5 +9,10 @@
 	   https://www.springframework.org/schema/context/spring-context.xsd
 		">
 
-	<context:component-scan base-package="com.wch.study.spring"></context:component-scan>
+<!--	<context:component-scan base-package="com.wch.study.spring"></context:component-scan>-->
+	<bean id="user" class="com.wch.study.spring.entity.User" name="user4,user5;user6">
+	</bean>
+
+	<alias name="user" alias="user2"/>
+	<alias name="user5" alias="user3"/>
 </beans>

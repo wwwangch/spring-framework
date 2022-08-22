@@ -119,22 +119,28 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 */
 	@SuppressWarnings("deprecation")  // for Environment.acceptsProfiles(String...)
 	protected void doRegisterBeanDefinitions(Element root) {
-		// Any nested <beans> elements will cause recursion in this method. In
-		// order to propagate and preserve <beans> default-* attributes correctly,
-		// keep track of the current (parent) delegate, which may be null. Create
-		// the new (child) delegate with a reference to the parent for fallback purposes,
-		// then ultimately reset this.delegate back to its original (parent) reference.
-		// this behavior emulates a stack of delegates without actually necessitating one.
+		//任何嵌套的 <beans> 元素都将导致此方法中的递归。
+		// 为了正确传播和保留 <beans> 默认属性，请跟踪当前（父）委托，该委托可能为空。
+		// 使用对父级的引用创建新的（子级）委托以用于回退目的，然后最终将 this.delegate 重置回其原始（父级）引用。
+		// 这种行为模拟了一堆委托，而实际上不需要一个委托。
+
+		//记录当前父委托
 		BeanDefinitionParserDelegate parent = this.delegate;
+
+		// 创建 delegate 对象，解析 Element 的各种方法
 		this.delegate = createDelegate(getReaderContext(), root, parent);
 
+		// 验证 XML 文件的命名空间，
+		// 即判断是否含有 xmlns="http://www.springframework.org/schema/beans"
 		if (this.delegate.isDefaultNamespace(root)) {
+			// 获取profile属性的值  <beans profile="dev,;prd"></beans>
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 			if (StringUtils.hasText(profileSpec)) {
+				//将字符串按照指定的字符转换成String[]数组，如字符串中不包含指定字符，则将整个字符串放进数组。
+				//如指定字符有多个，是分别按单个字符来切割的。这里按照逗号 分号 空格 分隔 ",; "
 				String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
 						profileSpec, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);
-				// We cannot use Profiles.of(...) since profile expressions are not supported
-				// in XML config. See SPR-12458 for details.
+				// 判断你指定的环境是否与加载的配置文件的环境一致，如果不一致直接返回
 				if (!getReaderContext().getEnvironment().acceptsProfiles(specifiedProfiles)) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Skipped XML bean definition file due to specified profiles [" + profileSpec +
@@ -144,9 +150,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				}
 			}
 		}
-
+		// 前置空方法
 		preProcessXml(root);
+		// 解析方法
 		parseBeanDefinitions(root, this.delegate);
+		// 后置空方法
 		postProcessXml(root);
 
 		this.delegate = parent;
@@ -166,38 +174,55 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param root the DOM root element of the document
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
+		//是否是DefaultNamespace
 		if (delegate.isDefaultNamespace(root)) {
 			NodeList nl = root.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
 				if (node instanceof Element) {
 					Element ele = (Element) node;
+					// 如果符合Spring的命名规则，对该标签进行解析。
+					// 实例 <bean id="user" class="com.gongj.bean.User"></bean>
 					if (delegate.isDefaultNamespace(ele)) {
 						parseDefaultElement(ele, delegate);
 					}
 					else {
+						// 解析用户自定义的规则
+						// <tx:annotation-driven/>
 						delegate.parseCustomElement(ele);
 					}
 				}
 			}
 		}
 		else {
+			// 解析用户自定义的规则
 			delegate.parseCustomElement(root);
 		}
 	}
 
 	private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
+		// 解析import标签  <import resource="spring-config.xml"></import>
 		if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
 			importBeanDefinitionResource(ele);
 		}
+		// 解析alias标签 <alias name="user" alias="user2"></alias>
 		else if (delegate.nodeNameEquals(ele, ALIAS_ELEMENT)) {
 			processAliasRegistration(ele);
 		}
+		// 解析bean标签 <bean id="user" class="com.gongj.bean.User"></bean>
 		else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
 			processBeanDefinition(ele, delegate);
 		}
+		// 解析beans标签
+		/**
+		 * <beans profile="dev">
+		 * 		<bean id="user" class="User"></bean>
+		 * 		<import resource="spring-config.xml"></import>
+		 * 		<alias name="user" alias="user2"></alias>
+		 * 	</beans>
+		 */
 		else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
-			// recurse
+			//调用doRegisterBeanDefinitions,再次重复解析xml的过程
 			doRegisterBeanDefinitions(ele);
 		}
 	}
